@@ -11,3 +11,5 @@ node_modules/
 dist/
 build/
 out/
+public/.DS_Store
+views/.DS_Store
