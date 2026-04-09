@@ -1,0 +1,13 @@
+.env
+node_modules/
+*.pem
+*.key
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.log
+*~
+dist/
+build/
+out/
