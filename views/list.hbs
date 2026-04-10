@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />	
+	<link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="styles/index.css" />
+	<link rel="stylesheet" type="text/css" href="styles/font.css" />
+	<style type="text/css">
+		.table-bordered th,
+		.table-bordered td {
+			border-color: #88a7d9 !important;
+		}
+		#pageSelectors a:hover { text-decoration: none; }
+
+		#pageSelectors a { padding-left: 5px; }
+
+		#pageSelectors .active { font-weight: bold; }
+	</style>
+	<title>Save the Zebras</title>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="">Boat Repair LLC</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/">Add Repair</a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link" href="/list">Fixed Boat List</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/join">Add Technician</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/guide">Guide</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/leaderboard">Leaderboard</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<br /><br />
+	<div class="w-75 justify-content-center" style="margin: 0 auto;">
+		<div class="row">
+			<div class="col">
+				<h2>Repairs</h2>
+			</div>
+			<div class="col">
+			</div>
+			<div class="col" style="text-align: right; vertical-align: middle;">
+			</div>
+			<div class="col">
+				<input class="form-control align-right" type="text" id="searchBar" placeholder="Search by Term..." />
+			</div>
+		</div>
+		<hr />
+		<table class="table table-bordered" id="repairTable">
+			<thead style="background-color: #9db9fa;">
+				<tr>
+					<th scope="col">Repair ID</th>
+					<th scope="col">Hull Number</th>
+					<th scope="col">Vessel Type</th>
+					<th scope="col">Tech ID</th>
+                    <th scope="col">Marina ID</th>
+					<th scope="col">Dock Location</th>
+					<th scope="col">Berth Number</th>
+					<th scope="col">Repair Cost</th>
+					<th scope="col">Money Saved</th>
+					<th scope="col">Date/Time Fixed</th>
+				</tr>
+			</thead>
+			<tbody id="repairTBody">
+			</tbody>
+		</table>
+		<div style="text-align: right; vertical-align: middle;">
+			<p id="pageSelectors" style="padding-right: 10px; font-size: 1.3rem;">
+			</p>
+		</div>
+	</div>
+	<br /><br /><br /><br /><br /><br />
+	<script type="text/javascript" src="scripts/jquery-3.3.1.slim.min.js"></script>
+	<script type="text/javascript" src="scripts/popper.min.js"></script>
+	<script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="scripts/sharedUtils.js"></script>
+	<script>
+		let pastPageSelection = 'pageLink1';
+		let rowsLength = 0;
+		function updateTable(event) {
+			changeTableContents(event.target.value, rowsLength);
+		}
+		const searchBar = document.getElementById('searchBar');
+		searchBar.addEventListener('input', updateTable);
+
+		window.onload = function () {
+			let rows = {{{rows}}};
+			changeTableContents("", rows.length);
+			calculatePages(rows.length);
+		}
+
+		function calculatePages(rowsLength) {
+			let currentNumber = rowsLength;
+			let count = 0;
+			while (currentNumber > 0) {
+				count = count + 1;
+				document.getElementById("pageSelectors").innerHTML += "<a id='" + currentNumber + "'style='color: black; padding-left: 10px;' onclick='clickPageLink(this)'>" + count + "</a>";
+				currentNumber = currentNumber - 25;
+			}
+			document.getElementById(rowsLength).classList.add('active');
+			pastPageSelection = rowsLength;
+		}
+
+		function clickPageLink(event) {
+			document.getElementById(pastPageSelection).classList.remove("active");
+			document.getElementById(event.id).classList.add("active");
+			pastPageSelection = event.id;
+			changeTableContents("", event.id);
+		}
+
+		function changeTableContents(strTechnicianId, pageNumber) {
+			let tableBody = document.getElementById("repairTBody");
+			let rows = {{{rows}}};
+			rowsLength = rows.length;
+			tableBody.innerHTML = "";
+			let bFound = false;
+            let searchTerm = strTechnicianId.toLowerCase();
+			Object.keys(rows).forEach(key => {
+				const value = rows[key];
+                if (value.berth_number == null) {
+                    value.berth_number = "";
+                }
+
+				if (value.repair_id > pageNumber || value.repair_id <= pageNumber - 25) {
+					return;
+				}
+                let newDate = transformDate(value.date_time_fixed);
+                let newRepairCost = '$' + usMoneyFormatter.format(value.repair_cost);
+                let newMoneySaved = '$' + usMoneyFormatter.format(value.money_saved);
+				if (value.technician_id.toLowerCase().includes(searchTerm) || value.marina_id.toLowerCase().includes(searchTerm) ||
+                    value.dock_location.toLowerCase().includes(searchTerm) || value.berth_number.toString().includes(searchTerm) ||
+                    value.vessel_type_name.toLowerCase().includes(searchTerm) || value.hull_id_number.toLowerCase().includes(searchTerm) ||
+                    newRepairCost.toString().includes(searchTerm) || newMoneySaved.toLowerCase().includes(searchTerm) ||
+                    newDate.toLowerCase().includes(searchTerm) ) {
+					// Insert a new row at the end of the tbody (-1 index means the last position)
+					let newRow = tableBody.insertRow(-1);
+					bFound = true;
+					// Insert new cells into the row in the correct order (index starts at 0)
+					let cell1 = newRow.insertCell(0);
+					let cell2 = newRow.insertCell(1);
+					let cell3 = newRow.insertCell(2);
+					let cell4 = newRow.insertCell(3);
+					let cell5 = newRow.insertCell(4);
+					let cell6 = newRow.insertCell(5);
+					let cell7 = newRow.insertCell(6);
+					let cell8 = newRow.insertCell(7);
+					let cell9 = newRow.insertCell(8);
+                    let cell10 = newRow.insertCell(9);
+					// Add data to the cells
+					cell1.innerHTML = value.repair_id;
+					cell2.innerHTML = '<a href="/vessel?hullnumber=' + value.hull_id_number + '">' + value.hull_id_number + '</a>';
+					cell3.innerHTML = value.vessel_type_name;
+					cell4.innerHTML = '<a href="/technician?technicianid=' + value.technician_id + '">' + value.technician_id + '</a>';
+                    cell5.innerHTML = '<a href="/marina?marinaid=' + value.marina_id + '">' + value.marina_id + '</a>';
+					cell6.innerHTML = value.dock_location;
+					cell7.innerHTML = value.berth_number;
+					cell8.innerHTML = '$' + usMoneyFormatter.format(value.repair_cost);
+					cell9.innerHTML = '$' + usMoneyFormatter.format(value.money_saved);
+					cell10.innerHTML = transformDate(value.date_time_fixed);
+				}
+			});
+			if (bFound == false) {
+				let newRow = tableBody.insertRow(-1);
+				let cell = newRow.insertCell(0);
+				cell.innerHTML = 'No results were found';
+				cell.colSpan = 10;
+				cell.style.textAlign = 'center';
+			}
+		}
+	</script>
+</body>
+</html>

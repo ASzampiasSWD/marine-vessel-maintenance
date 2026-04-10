@@ -1,0 +1,7 @@
+body { background-image: linear-gradient(180deg, 
+                                      #9de7fa 80%, 
+									  #88a7d9 100%);
+									/*  #A7BFE8 100%);*/
+	   color: black;
+       font-family: "Poppins", sans-serif;
+       min-height: 100vh; }

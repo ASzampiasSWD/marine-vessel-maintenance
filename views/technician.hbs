@@ -125,7 +125,7 @@
 				let cell8 = newRow.insertCell(7);
 				let cell9 = newRow.insertCell(8);
 				cell1.innerHTML = value.repair_id;
-				cell2.innerHTML = '<a href="/printer?serial=' + value.hull_id_number + '">' + value.hull_id_number + '</a>'; //value.hull_id_number;
+				cell2.innerHTML = '<a href="/vessel?hullnumber=' + value.hull_id_number + '">' + value.hull_id_number + '</a>';
 				cell3.innerHTML = value.vessel_type_name;
 				cell4.innerHTML = value.technician_id;
 				cell5.innerHTML = value.dock_location;

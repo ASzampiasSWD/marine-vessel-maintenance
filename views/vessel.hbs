@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Save the Zebras</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="styles/index.css" />
+	<link rel="stylesheet" type="text/css" href="styles/font.css" />
+	<style type="text/css">
+		.table-bordered th,
+		.table-bordered td {
+			border-color: #88a7d9 !important;
+		}
+	</style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="">Boat Repair LLC</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/">Add Repair</a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link" href="/list">Fixed Boat List</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/join">Add Technician</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/guide">Guide</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/leaderboard">Leaderboard</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<br /><br />
+	<div class="w-75 justify-content-center" style="margin: 0 auto;">
+		<div class="row">
+			<div class="col">
+				<h2>Vessel Stats: {{{serial}}}</h2>
+			</div>
+		</div>
+		<hr />
+		<h3>Vessel Information</h3>
+		<table class="table table-bordered" id="vesselTable">
+			<thead style="background-color: #9db9fa;">
+				<th>Serial Number</th>
+				<th>Vessel Type</th>
+				<th>Warranty Start Date</th>
+				<th>Warranty End Date</th>
+				<th>Is Active?</th>
+				<th>Entry Created At</th>
+			</thead>
+			<tbody id="vesselTBody">
+				<td id="serialNumber"></td>
+				<td id="vesselType"></td>
+				<td id="warrantyStartDate"></td>
+				<td id="warrantyEndDate"></td>
+				<td id="isActive"></td>
+				<td id="entryCreatedAt"></td>
+			</tbody>
+
+		</table>
+		<h3>Repairs</h3>
+		<table class="table table-bordered" id="repairTable">
+			<thead style="background-color: #9db9fa;">
+				<tr>
+					<th scope="col">Repair ID</th>
+					<th scope="col">Technician ID</th>
+					<th scope="col">Dock Station</th>
+					<th scope="col">Berth Number</th>
+					<th scope="col">Repair Cost</th>
+					<th scope="col">Money Saved</th>
+					<th scope="col">Comments</th>
+					<th scope="col">Date/Time Fixed</th>
+				</tr>
+			</thead>
+			<tbody id="repairTBody">
+			</tbody>
+		</table>
+		<h3>Issues</h3>
+		<table class="table table-bordered" id="issuesTable">
+			<thead style="background-color: #9db9fa;">
+				<tr>
+					<th scope="col">Repair ID</th>
+					<th scope="col">Issue Description</th>
+				</tr>
+			</thead>
+			<tbody id="issueTBody">
+			</tbody>
+		</table>
+		<h3>Parts Used</h3>
+		<table class="table table-bordered" id="partsTable">
+			<thead style="background-color: #9db9fa;">
+				<tr>
+					<th scope="col">Repair ID</th>
+					<th scope="col">Part Number</th>
+					<th scope="col">Part Name</th>
+					<th scope="col">Cost</th>
+				</tr>
+			</thead>
+			<tbody id="partNamesTBody">
+			</tbody>
+		</table>
+
+		<h3>All Time Stats</h3>
+		<table class="table table-bordered w-50">
+			<tr style="background-color: #9db9fa;">
+				<th colspan="2" class="text-center">Stats</th>
+			</tr>
+			<tr>
+				<td class="col-2">Total Times Repaired</td>
+				<td class="col-2" id="totalTimesRepaired"></td>
+			</tr>
+			<tr>
+				<td class="col-2">Total Money Saved</td>
+				<td class="col-2" id="totalMoneySaved"></td>
+			</tr>
+		</table>
+	</div>
+	<br /><br />
+	<script type="text/javascript" src="scripts/jquery-3.3.1.slim.min.js"></script>
+	<script type="text/javascript" src="scripts/popper.min.js"></script>
+	<script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="scripts/sharedUtils.js"></script>
+	<script>
+		window.onload = function () {
+			let tableBody = document.getElementById("repairTBody");
+			let rows = {{{ rows }}};
+			let issueRows = {{{ issueRows }}};
+			let totalMoneySaved = 0;
+			document.getElementById('totalTimesRepaired').innerHTML = rows.length;
+			document.getElementById('serialNumber').innerHTML = rows[0].serial_number_id;
+			document.getElementById('vesselType').innerHTML = rows[0].vessel_type_name;
+			document.getElementById('warrantyStartDate').innerHTML = transformDate(rows[0].warranty_start_date);
+			document.getElementById('warrantyEndDate').innerHTML = transformDate(rows[0].warranty_end_date);
+			document.getElementById('isActive').innerHTML = rows[0].is_active;
+			document.getElementById('entryCreatedAt').innerHTML = transformDate(rows[0].date_time_fixed);
+			Object.keys(rows).forEach(key => {
+				const value = rows[key];
+				// Insert a new row at the end of the tbody (-1 index means the last position)
+				let newRow = tableBody.insertRow(-1);
+				let cell1 = newRow.insertCell(0);
+				let cell2 = newRow.insertCell(1);
+				let cell3 = newRow.insertCell(2);
+				let cell4 = newRow.insertCell(3);
+				let cell5 = newRow.insertCell(4);
+				let cell6 = newRow.insertCell(5);
+				let cell7 = newRow.insertCell(6);
+				let cell8 = newRow.insertCell(7);
+				cell1.innerHTML = value.repair_id;
+				cell2.innerHTML = '<a href="/technician?technicianid=' + value.technician_id + '">' + value.technician_id + '</a>';
+				cell3.innerHTML = value.dock_location;
+				cell4.innerHTML = value.berth_number;
+				cell5.innerHTML = '$' + usMoneyFormatter.format(value.repair_cost);
+				cell6.innerHTML = '$' + usMoneyFormatter.format(value.money_saved);
+				cell7.innerHTML = value.comments;
+				cell8.innerHTML = transformDate(value.date_time_fixed);
+				totalMoneySaved += parseFloat(value.money_saved);
+			});
+			document.getElementById('totalMoneySaved').innerHTML = '$' + usMoneyFormatter.format(totalMoneySaved);
+			let issuesBody = document.getElementById("issueTBody");
+
+			Object.keys(issueRows).forEach(key => {
+				const value = issueRows[key];
+				let newRow1 = issuesBody.insertRow(-1);
+				let cell1 = newRow1.insertCell(0);
+				let cell2 = newRow1.insertCell(1);
+				cell1.innerHTML = value.repair_id;
+				cell2.innerHTML = value.issue_description;
+			});
+
+			let partNameRows = {{{ partNameRows }}};
+			let partNamesBody = document.getElementById("partNamesTBody");
+			let bPartsExist = false;
+
+			Object.keys(partNameRows).forEach(key => {
+				const value = partNameRows[key];
+				let newRow = partNamesBody.insertRow(-1);
+				let cell1 = newRow.insertCell(0);
+				let cell2 = newRow.insertCell(1);
+				let cell3 = newRow.insertCell(2);
+				let cell4 = newRow.insertCell(3);
+				cell1.innerHTML = value.repair_id;
+				cell2.innerHTML = value.vessel_part_id;
+				cell3.innerHTML = value.vessel_part_name;
+				cell4.innerHTML = '$' + usMoneyFormatter.format(value.price);
+				bPartsExist = true;
+			});
+			if (bPartsExist == false) {
+				let newRow = partNamesBody.insertRow(-1);
+				let cell1 = newRow.insertCell(0);
+				cell1.colSpan = 4;
+				cell1.style.textAlign = "center";
+				cell1.innerHTML = "No Parts Have Been Used";
+			}
+		}
+	</script>
+	<br /><br /><br /><br />
+</body>
+</html>
