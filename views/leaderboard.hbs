@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="styles/index.css" />
+	<link rel="stylesheet" type="text/css" href="styles/font.css" />
+	<style type="text/css">
+		.table-bordered th,
+		.table-bordered td {
+			border-color: #88a7d9 !important;
+		}
+	</style>
+	<title>Save the Boats</title>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="">Boat Repair LLC</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/">Add Repair</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/list">Fixed Boat List</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/join">Add Technician</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/guide">Guide</a>
+				</li>
+                <li class="nav-item active">
+					<a class="nav-link" href="/leaderboard">Leaderboard</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<br /><br />
+	<div class="w-75 justify-content-center" style="margin: 0 auto;">
+		<h2>Leaderboard</h2>
+		<hr />
+		<h2>Top Ten Orgs</h2>
+	<table class="table table-bordered w-75" id="leaderboardTable">
+		<thead style="background-color: #9db9fa;">
+			<tr>
+				<th scope="col">Rank</th>
+				<th scope="col">Marina Name</th>
+				<th scope="col">Total Boats Fixed</th>
+				<th scope="col">Total Money Saved</th>
+				<th scope="col">Total Spent on Repairs</th>
+			</tr>
+		</thead>
+		<tbody id="leaderboardTBody">
+		</tbody>
+	</table>
+
+	<h2>Top Ten Users</h2>
+	<table class="table table-bordered w-75" id="UserTable">
+		<thead style="background-color: #9db9fa;">
+			<tr>
+				<th scope="col">Rank</th>
+				<th scope="col">Marina Name</th>
+				<th scope="col">Tech ID</th>
+				<th scope="col">Total Boats Fixed</th>
+				<th scope="col">Total Money Saved</th>
+				<!--<th scope="col">Total Spent on Repairs</th>-->
+			</tr>
+		</thead>
+		<tbody id="userTBody">
+		</tbody>
+	</table>
+	<br /><br />
+	</div>
+	<script type="text/javascript" src="scripts/jquery-3.3.1.slim.min.js"></script>
+	<script type="text/javascript" src="scripts/popper.min.js"></script>
+	<script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="scripts/sharedUtils.js"></script>
+	<script>
+		window.onload = function () {
+			setMarinaLeaderboard();
+			setTechLeaderboard();
+		}
+		function setMarinaLeaderboard() {
+			let tableBody = document.getElementById("leaderboardTBody");
+            tableBody.innerHTML = "";
+            let repairRow = {{{repairRows}}};
+           	Object.keys(repairRow).forEach(key => {
+				const value = repairRow[key];
+				let newRow = tableBody.insertRow(-1);
+				let cell1 = newRow.insertCell(0);
+				let cell2 = newRow.insertCell(1);
+				let cell3 = newRow.insertCell(2);
+				let cell4 = newRow.insertCell(3);
+				let cell5 = newRow.insertCell(4);
+				cell1.innerHTML = parseInt(key) + 1;
+				cell2.innerHTML = '<a href="/marina?marinaid=' + value.marina_id + '">' + value.marina_id + '</a>';
+				cell3.innerHTML = value.count;
+				cell4.innerHTML = '$' + usMoneyFormatter.format(value.money_saved);
+				cell5.innerHTML = '$' + usMoneyFormatter.format(value.repair_cost);
+			});
+        }
+		function setTechLeaderboard() {
+        	let tableBody = document.getElementById("userTBody");
+            tableBody.innerHTML = "";
+            let userRows = {{{userRows}}};
+           	Object.keys(userRows).forEach(key => {
+				const value = userRows[key];
+				let newRow = tableBody.insertRow(-1);
+				let cell1 = newRow.insertCell(0);
+				let cell2 = newRow.insertCell(1);
+				let cell3 = newRow.insertCell(2);
+				let cell4 = newRow.insertCell(3);
+				let cell5 = newRow.insertCell(4);
+				cell1.innerHTML = parseInt(key) + 1;
+				cell2.innerHTML = '<a href="/marina?marinaid=' + value.marina_id + '">' + value.marina_id + '</a>';
+				cell3.innerHTML = '<a href="/technician?technicianid=' + value.technician_id + '">' + value.technician_id + '</a>';
+				cell4.innerHTML = value.total_repairs;
+				cell5.innerHTML = '$' + usMoneyFormatter.format(value.money_saved);
+			});
+        }
+	</script>
+</body>
+</html>
