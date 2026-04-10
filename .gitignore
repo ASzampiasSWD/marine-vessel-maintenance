@@ -13,3 +13,6 @@ build/
 out/
 public/.DS_Store
 views/.DS_Store
+package-lock.json
+package.json
+views/admin.hbs
