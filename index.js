@@ -3,11 +3,9 @@ const exphbs = require('express-handlebars');
 const path = require('path');
 const http = require('http');
 const https = require('https');
-const multer = require('multer');
 const app = express();
 var pg = require('pg');
 const db = require('./db');
-//const credentials = require('./credentials');
 var favicon = require('serve-favicon');
 
 // Set up Handlebars view engine
@@ -25,9 +23,6 @@ app.use(favicon(path.join(__dirname, 'public', 'styles', 'favicon.ico')));
 // Built-in middleware to parse URL-encoded bodies (form data)
 app.use(express.urlencoded({ extended: true }));
 
-// Configure Multer for basic file destination
-const upload = multer({ dest: 'uploads/' });
-
 function getFormattedDate(date) {
   let year = date.getFullYear();
   // getMonth() returns 0-11, so add 1 for actual month number (1-12)
@@ -37,19 +32,6 @@ function getFormattedDate(date) {
   // Combine the parts in MM-DD-YYYY format
   return `${month}-${day}-${year}`;
 }
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Specify the destination folder
-  },
-  filename: function (req, file, cb) {
-    let today = new Date();
-    let arFileName = file.originalname.split('.'); // get extension.
-    cb(null, req.body.productName + '_' + getFormattedDate(today) + '.' + arFileName[1]);
-  }
-});
-
-const uploadCustom = multer({ storage: storage });
 
 app.get('/', async (req, res) => {
 	try {
@@ -206,16 +188,6 @@ async function getPartNamesByHullNumberNumber(hullNumberId) {
 	}
 }
 
-/*app.get('/admin', async (req, res) => {
-    let productNameRows = await getProductNames();
-    let vesselPartNames = await getVesselPartNames();
-    let vesselTypes = await getVesselTypes();
-    res.render('admin', { productNames : JSON.stringify(productNameRows),
-                          vesselPartNames : JSON.stringify(vesselPartNames),
-                          vesselTypes : JSON.stringify(vesselTypes) });
-
-});*/
-
 app.get('/guide', async (req, res) => {
     try {
         res.render('guide', { });
@@ -329,25 +301,9 @@ app.get('/join', async (req, res) => {
 	}
 });
 
-/*app.post('/submit-price', uploadCustom.single('file'), async (req, res) => {
-    let { productName, price, referer, screenshot  } = req.body;
-    console.log(req.file);
-    console.log(req.body);
-    console.log(productName);
-    console.log(price);
-    console.log(referer);
-    console.log(screenshot);
-    res.status(200).send('OK');
-});*/
-
 app.post('/submit-repair', async (req, res) => {
 	let { hullNumberId, technicianId, vesselType, partNameNeeded, vesselLocation, berthNumber, issue, timeSpentOnTask, comments, repair_cost, money_saved } = req.body;
 	hullNumberId = hullNumberId.toUpperCase();
-    console.log(hullNumberId);
-    console.log(technicianId);
-    console.log(partNameNeeded);
-    console.log(vesselLocation);
-    console.log(berthNumber);
 	if (berthNumber == "") {
 		berthNumber = null;
 	}
@@ -463,25 +419,6 @@ app.post('/submit-new-technician', async (req, res) => {
 		}
 	}
 })
-
-/*
-// FOR TEST WITHOUT CERTS
-app.listen(3000, () => {
-  console.log(`Example app listening on port 3000!`);
-});
-//FOR PRODUCTION
-http.createServer((req, res) => {
-	// Redirect to the HTTPS version of the same URL
-	res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-	res.end();
-}).listen(80, () => {
-	console.log('HTTP Server listening on port 80 for redirects');
-});
-
-const httpsServer = https.createServer(credentials.credentials, app);
-httpsServer.listen(443, () => {
-	console.log('HTTPS Server running on port 443');
-});*/
 
 const server = http.createServer(app);
 server.listen(3000, () => {
