@@ -1,0 +1,13 @@
+# Put this service file in the /etc/systemd/system directory. sudo systemctl start boat. Deprecated in my project, use pm2 instead
+[Unit]
+Description=Node Server for BoatWeb
+After=network.target
+[Service]
+Type=simple
+ExecStart=sudo node /home/ec2-user/boat/index.js
+User=ec2-user
+Restart=always
+RestartSec=1
+WorkingDirectory=/home/ec2-user/boat
+[Install]
+WantedBy=multi-user.target
