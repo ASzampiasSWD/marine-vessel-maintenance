@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<title>Save the Boats</title>
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="styles/index.css" />
+	<link rel="stylesheet" type="text/css" href="styles/font.css" />
+	<style type="text/css">
+		.scrollable-checkbox-list {
+					max-height: 125px;
+					overflow-y: auto;
+					border: 1px solid #ced4da;
+					background-color: white;
+					color: #495057;
+					line-height: 1.5;
+					font-weight: 400;
+					font-size: 1rem;
+					border-radius: .25rem;
+					padding: .375rem .75rem;
+					background-clip: padding-box;
+					transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+					height: 125px; }
+	</style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="">Boat Repair LLC</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="/">Add Repair</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/list">Fixed Boat List</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/join">Add Technician</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/guide">Guide</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/leaderboard">Leaderboard</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<br /><br />
+	<div class="container">
+		<h2>Add Vessel Repair</h2>
+		<hr />
+		<form action="/submit-repair" method="POST">
+			<div class="form-row">
+				<div class="form-group col-md-6">
+					<label for="hullNumberId" class="form-label">Hull ID Number</label>
+					<input type="text" class="form-control" id="hullNumberId" placeholder="Hull ID Number"
+						name="hullNumberId" maxlength="12" required />
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-md-6">
+					<label for="vesselType" class="form-label">Vessel Type</label>
+					<select id="vesselType" name="vesselType" onchange="recordVesselType(event, 'input')"
+						class="form-select form-control form-select-lg" required>
+					</select>
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-md-6">
+					<label for="vesselLocation" class="form-label">Vessel Location</label>
+					<select id="vesselLocation" name="vesselLocation" class="form-select form-control form-select-lg"
+						onchange="recordVesselLocation(event)" required>
+						<option value="Open Lot">Open Lot</option>
+						<option value="Parking Space">Parking Space</option>
+					</select>
+				</div>
+				<div class="form-group col-md-6">
+					<label for="berthNumber" class="form-label">Berth Number</label>
+					<input type="text" disabled name="berthNumber" class="form-control w-50" placeholder="Optional"
+						id="berthNumber" />
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-md-6 w-50">
+					<label for="partNameNeededCheck" class="form-label">Part Name Needed</label>
+					<div id="partNameNeededCheck" class="scrollable-checkbox-list">
+					</div>
+				</div>
+				<div class="form-group col-md-6">
+					<label for="issueCheck" class="form-label">Issue</label>
+					<div id="issueCheck" class="scrollable-checkbox-list w-50">
+					</div>
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-md-3">
+					<label for="technicianId" class="form-label">Technician ID</label><br />
+					<select id="technicianId" name="technicianId"
+						class="form-select form-control form-select-lg" required>
+					</select>
+				</div>
+				<div class="form-group col-md-3">
+					<label for="timeSpentOnTask" class="form-label">Minutes Spent On Task</label>
+					<input type="number" id="timeSpentOnTask" name="timeSpentOnTask" class="form-control" />
+				</div>
+				<div class="form-group col-md-3">
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-md-9">
+					<label for="comments" class="form-label">Comments</label>
+					<textarea class="form-control" id="comments" name="comments" maxlength="100" placeholder="Optional"
+						rows="3"></textarea>
+				</div>
+			</div>
+			<input type="hidden" value="" name="issue" id="issue" />
+			<input type="hidden" value="" name="partNameNeeded" id="partNameNeeded" />
+			<input type="hidden" value="0.00" name="money_saved" id="money_saved" />
+			<input type="hidden" value="0.00" name="repair_cost" id="repair_cost" />
+			<button type="button" class="btn btn-primary" data-toggle="modal"
+				data-target="#modalCalculate">Submit</button>
+			<br /><br /><br /><br /><br /><br />
+			<!-- Modal -->
+			<div class="modal fade" id="modalCalculate" tabindex="-1" role="dialog"
+				aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLongTitle">Cost Savings</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body" id="modalBody">
+
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							<button type="submit" id="submitBtn" class="btn btn-primary">Confirm</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<script type="text/javascript" src="scripts/jquery-3.3.1.slim.min.js"></script>
+	<script type="text/javascript" src="scripts/popper.min.js"></script>
+	<script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+	<script type="text/javascript">
+
+		let vesselOption = 1;
+		let partNameNeeded = [];
+		let issueChosen = [];
+		let mapVesselPartCostById = new Map();
+		let mapVesselPartNameById = new Map();
+
+		window.onload = function () {
+			let vessel_types = {{{vessel_types}}};
+			const selectVesselType = document.getElementById("vesselType");
+
+			Object.keys(vessel_types).forEach(key => {
+				const value = vessel_types[key];
+				let newOption = new Option(value.vessel_type_name, value.vessel_type_id);
+				selectVesselType.add(newOption);
+			});
+
+			let issues = {{{issues}}};
+			let checkIssues = document.getElementById("issueCheck")
+
+			Object.keys(issues).forEach(key => {
+				const value = issues[key];
+				let checkId = "issue" + key;
+				checkIssues.innerHTML += '<div class="form-check"> <input class="form-check-input" type="checkbox" onchange="recordIssueChosen(this)" value="' + value.issue_id  +'" id="' + checkId  +'"> <label class="form-check-label" style="display: block;" for="' + checkId + '">' + value.issue_description + '</label></div>';
+			});
+
+			let active_technicians = {{{active_technicians}}};
+			const selectTechnicianId = document.getElementById("technicianId");
+			let blankOption = new Option("", "");
+			selectTechnicianId.add(blankOption);
+			Object.keys(active_technicians).forEach(key => {
+				const value = active_technicians[key];
+				let newOption = new Option(value.technician_id, value.technician_id);
+				selectTechnicianId.add(newOption);
+			});
+
+			let vessel_parts = {{{vessel_parts}}};
+			const checkVesselPartNeeded = document.getElementById("partNameNeededCheck");
+
+			Object.keys(vessel_parts).forEach(key => {
+				const value = vessel_parts[key];
+				if (value.vessel_type_id == 1) {
+					let newOption = new Option(value.vessel_part_name, value.vessel_part_id);
+					mapVesselPartCostById.set(value.vessel_part_id, value.price);
+					mapVesselPartNameById.set(value.vessel_part_id, value.vessel_part_name);
+					checkVesselPartNeeded.innerHTML += '<div class="form-check"> <input class="form-check-input" type="checkbox" onchange="recordVesselPartNeeded(this)" value="' + value.vessel_part_id  +'" id="' + value.vessel_part_id  +'"> <label class="form-check-label" style="display: block;" for="' + value.vessel_part_id + '">' + value.vessel_part_name + '</label></div>';
+				}
+			});		
+		}
+
+		function recordVesselPartNeeded(e) {
+			if (e.checked) {
+				partNameNeeded.push(e.value);
+			} else {
+				partNameNeeded = partNameNeeded.filter(item => item !== e.value);
+			}    
+		}
+ 
+		function recordIssueChosen(e) {
+			if (e.checked) {
+				issueChosen.push(e.value);
+			} else {
+				issueChosen = issueChosen.filter(item => item !== e.value);
+			}    
+		}
+
+		function recordVesselType(e, location) {
+            if (location == 'input') {
+			    vesselOption = e.target.value;
+            } else {
+                vesselOption = e;
+            }
+			let vessel_parts = {{{vessel_parts}}};
+			let checkVesselPartNeeded = document.getElementById("partNameNeededCheck");
+			partNameNeededCheck.innerHTML = "";
+			partNameNeeded = [];
+			Object.keys(vessel_parts).forEach(key => {
+				const value = vessel_parts[key];
+				if (value.vessel_type_id == vesselOption) {
+					let newOption = new Option(value.vessel_part_name, value.vessel_part_id);
+					mapVesselPartCostById.set(value.vessel_part_id, value.price);
+					mapVesselPartNameById.set(value.vessel_part_id, value.vessel_part_name);
+					checkVesselPartNeeded.innerHTML += '<div class="form-check"> <input class="form-check-input" type="checkbox" onchange="recordVesselPartNeeded(this)" value="' + value.vessel_part_id  +'" id="' + key  +'"> <label class="form-check-label" style="display: block;" for="' + key + '">' + value.vessel_part_name + '</label></div>';
+				}
+			});	
+		}
+
+		function recordVesselLocation(e) {
+			if (e.target.value != "Open Lot") {
+				document.getElementById("berthNumber").disabled = false;
+			} else {
+				document.getElementById("berthNumber").disabled = true;
+			}
+		}
+
+		$(document).ready(function () {
+			$('#modalCalculate').on('shown.bs.modal', function (e) {
+				let modalBody = document.getElementById("modalBody");
+				if (issueChosen.length == 0) {
+					modalBody.innerHTML = "<p>Must chose issue. Go Back</p>";
+					alert('Must pick issue from checklist');
+					$('#modalCalculate').modal('hide');
+					return;
+				}
+				let newVesselOption = vesselOption - 1;
+				let vessel_types = {{{vessel_types}}};
+				let totalVesselName = vessel_types[newVesselOption].vessel_type_name;
+				let totalVesselCost = Number(vessel_types[newVesselOption].price);
+				let totalVesselPartCost = 0;
+				let newInnerHTML = "";
+				newInnerHTML += "<div class='row'><div class='col'>" + totalVesselName + "</div><div class='col'>+$" + totalVesselCost.toFixed(2) + "</div></div>";
+
+				let vessel_parts = {{{ vessel_parts }}};
+				let vesselParts = partNameNeeded; //$('#partNameNeeded').val();
+
+				for (let m = 0; m < vesselParts.length; m++) {
+					totalVesselPartCost += Number(mapVesselPartCostById.get(vesselParts[m]));
+					newInnerHTML += "<div class='row'><div class='col'>" + mapVesselPartNameById.get(vesselParts[m]) + "</div><div class='col'>-$" + mapVesselPartCostById.get(vesselParts[m]) + "</div></div>";
+				}
+				newInnerHTML += "<div class='row'><div class='col'></div><div class='col'>-----------</div></div></div>";
+				let totalValueSaved = totalVesselCost - totalVesselPartCost;
+				newInnerHTML += "<div class='row'><div class='col'>Total Value Saved</div><div class='col'>$" + totalValueSaved.toFixed(2) + "</div>";
+				document.getElementById("issue").value = issueChosen;
+				document.getElementById("partNameNeeded").value = partNameNeeded;
+				document.getElementById("repair_cost").value = totalVesselPartCost.toFixed(2);
+				document.getElementById("money_saved").value = totalValueSaved.toFixed(2);
+				modalBody.innerHTML = newInnerHTML;
+			});
+		});
+	</script>
+</body>
+</html>
