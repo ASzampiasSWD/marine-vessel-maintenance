@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="styles/index.css" />
+	<link rel="stylesheet" type="text/css" href="styles/font.css" />
+	<style type="text/css">
+		.table-bordered th,
+		.table-bordered td {
+			border-color: #88a7d9 !important;
+		}
+	</style>
+	<title>Save the Boats</title>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="">Boat Repair LLC</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/">Add Repair</a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link" href="/list">Fixed Boat List</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/join">Add Technician</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/guide">Guide</a>
+				</li>
+                <li class="nav-item">
+					<a class="nav-link" href="/leaderboard">Leaderboard</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	<br /><br />
+	<div class="w-75 justify-content-center" style="margin: 0 auto;">
+		<div class="row">
+			<div class="col">
+				<h2>Technician | {{{technicianId}}} | {{{firstName}}} {{{lastName}}} | {{{marinaId}}}</h2>
+			</div>
+		</div>
+		<hr />
+        <table class="table table-bordered w-50">
+			<tr style="background-color: #9db9fa;">
+				<th colspan="2" class="text-center">Technician Stats</th>
+			</tr>
+			<tr>
+				<td class="col-2">Total Repairs</td>
+				<td class="col-2" id="totalRepairs"></td>
+			</tr>
+			<tr>
+				<td class="col-2">Total Repair Cost</td>
+				<td class="col-2" id="totalRepairCost"></td>
+			</tr>
+			<tr>
+				<td class="col-2">Total Money Saved</td>
+				<td class="col-2" id="totalMoney"></td>
+			</tr>
+			<tr>
+				<td>Joined Date</td>
+				<td>{{{created_at}}}</td>
+			</tr>
+		</table>
+		<h3>Repairs</h3>
+		<table class="table table-bordered" id="repairTable">
+			<thead style="background-color: #9db9fa;">
+				<tr>
+					<th scope="col">Repair ID</th>
+					<th scope="col">Hull Number</th>
+					<th scope="col">Vessel Type</th>
+					<th scope="col">Technician ID</th>
+					<th scope="col">Dock Location</th>
+					<th scope="col">Birth Station</th>
+					<th scope="col">Repair Cost</th>
+					<th scope="col">Money Saved</th>
+					<th scope="col">Date/Time Fixed</th>
+				</tr>
+			</thead>
+			<tbody id="repairTBody">
+			</tbody>
+		</table>
+        <br /><br />
+	</div>
+	<br /><br />
+	<script type="text/javascript" src="scripts/jquery-3.3.1.slim.min.js"></script>
+	<script type="text/javascript" src="scripts/popper.min.js"></script>
+	<script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="scripts/sharedUtils.js"></script>
+	<script>
+		window.onload = function () {
+			let tableBody = document.getElementById("repairTBody");
+			let rows = {{{rows}}};
+			let totalMoneySaved = 0;
+			let totalRepairCost = 0;
+			document.getElementById('totalRepairs').innerHTML = rows.length;
+
+            if (rows.length == 0) {
+                let newRow = tableBody.insertRow(-1);
+				let cell1 = newRow.insertCell(0);
+                cell1.colSpan = 9;
+                cell1.style.textAlign = 'center';
+                cell1.innerHTML = "No Results Found";
+            }
+
+			Object.keys(rows).forEach(key => {
+				const value = rows[key];
+				// Insert a new row at the end of the tbody (-1 index means the last position)
+				let newRow = tableBody.insertRow(-1);
+				let cell1 = newRow.insertCell(0);
+				let cell2 = newRow.insertCell(1);
+				let cell3 = newRow.insertCell(2);
+				let cell4 = newRow.insertCell(3);
+				let cell5 = newRow.insertCell(4);
+				let cell6 = newRow.insertCell(5);
+				let cell7 = newRow.insertCell(6);
+				let cell8 = newRow.insertCell(7);
+				let cell9 = newRow.insertCell(8);
+				cell1.innerHTML = value.repair_id;
+				cell2.innerHTML = '<a href="/printer?serial=' + value.hull_id_number + '">' + value.hull_id_number + '</a>'; //value.hull_id_number;
+				cell3.innerHTML = value.vessel_type_name;
+				cell4.innerHTML = value.technician_id;
+				cell5.innerHTML = value.dock_location;
+				cell6.innerHTML = value.birth_station;
+				cell7.innerHTML = '$' + usMoneyFormatter.format(value.repair_cost);
+				cell8.innerHTML = '$' + usMoneyFormatter.format(value.money_saved);
+				cell9.innerHTML = transformDate(value.date_time_fixed);
+				totalMoneySaved += parseFloat(value.money_saved);
+				totalRepairCost += parseFloat(value.repair_cost);
+			});
+		document.getElementById('totalMoney').innerHTML = '$' + usMoneyFormatter.format(totalMoneySaved);
+		document.getElementById('totalRepairCost').innerHTML = '$' + usMoneyFormatter.format(totalRepairCost);
+		}
+	</script>
+</body>
+</html>
