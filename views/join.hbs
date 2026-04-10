@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="styles/index.css" />
+  <link rel="stylesheet" type="text/css" href="styles/font.css" />
+  <title>Save the Boats</title>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="">Boat Repair LLC</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Add Repair</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/list">Fixed Boat List</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="/join">Add Technician</a>
+        </li>
+        <li class="nav-item">
+			<a class="nav-link" href="/guide">Guide</a>
+		</li>
+         <li class="nav-item">
+			<a class="nav-link" href="/leaderboard">Leaderboard</a>
+		</li>
+      </ul>
+    </div>
+  </nav>
+  <br /><br />
+  <div class="container">
+    <h2>Add Technician</h2>
+    <hr />
+    <div class="row">
+      <div class="col-12 col-md-8">
+        <form action="/submit-new-technician" method="POST">
+          <div class="mb-3">
+			<label for="marinaId" class="form-label">Marina ID</label>
+            <input type="text" class="form-control w-50" id="marinaId" name="marinaId" maxlength="50"
+              placeholder="Marina ID (example: Waterside Marina)" required />
+
+          </div>
+          <div class="mb-3">
+            <label for="technicianId" class="form-label">Technician ID</label>
+            <input type="text" class="form-control" id="technicianId" autocapitalize="off" name="technicianId" maxlength="12"
+              placeholder="Technician ID (example: aszampias)" required />
+          </div>
+          <div class="mb-3">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="firstName" maxlength="50" name="firstName" required />
+          </div>
+          <div class="mb-3">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="lastName" maxlength="50" name="lastName" required />
+          </div>
+          <button type="submit" id="submitBtn" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="scripts/jquery-3.3.1.slim.min.js"></script>
+  <script type="text/javascript" src="scripts/popper.min.js"></script>
+  <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+</body>
+</html>
