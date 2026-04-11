@@ -112,7 +112,7 @@ async function getLastRepairId() {
 		return rows[0].repair_id;
 	} catch (err) {
 		console.error(err);
-		return err;
+		return 0;
 	}
 }
 
